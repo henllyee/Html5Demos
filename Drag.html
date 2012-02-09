@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>Drag</title>
+		<meta name="description" content="" />
+		<meta name="author" content="Henry" />
+		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<style>
+			.goods{
+				border: 1px solid green;
+				width:200px;
+				margin-top:5px;
+			}
+		</style>
+		<script type="text/javascript" language="JavaScript">
+			function getElementsbyClassName(n){
+			    var classElements=[],allElements=document.getElementsByTagName('*');
+			    for(var i=0;i<allElements.length;i++){
+			            if(allElements[i].className==n){
+			                    classElements[classElements.length]=allElements[i];
+			            }
+			    }
+			    return classElements;
+			}
+			function init()
+			{
+				var goodsList = getElementsbyClassName('goods');
+				var box = document.getElementById('box');
+				for(var i=0;i<goodsList.length;i++)
+				{
+					goodsList[i].addEventListener('dragstart',function(ev){
+						var dt = ev.dataTransfer;
+						dt.effectAllowed='all';
+						dt.setData('text/plain',this.textContent);
+					},false);
+				}
+				box.addEventListener('dragend',function(ev){
+					ev.preventDefault();
+				},false);
+				box.addEventListener('drop',function(ev){
+					var dt = ev.dataTransfer;
+					var goodsName = dt.getData('text/plain');
+					box.textContent+=goodsName;
+					ev.preventDefault();
+					ev.stopPropagation();
+				},false);
+			}
+			document.ondragover = function(e){e.preventDefault();};
+			document.ondrop = function(e){e.preventDefault();};
+		</script>
+	</head>
+	<body onload="init()">
+		<span>商品列表：</span>
+		<div class="goodsList">
+			<div class="goods" draggable="true">ThinkPad T410i</div>
+			<div class="goods" draggable="true">Ipad 2</div>
+		</div>
+		<span>已选商品：</span>
+		<div id="box" style="width: 200px;height: 200px;border: 1px solid green;"></div>
+	</body>
+</html>
