@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>WebSqlDataBase</title>
+		<script language="JavaScript" type="text/javascript">
+			var db = openDatabase('MyData','','My Data',202400);
+			var messageTable ;
+			function init()
+			{
+				messageTable = document.getElementById('messageTable');
+				db.transaction(function(tx)
+				{
+					tx.executeSql('CREATE TABLE IF NOT EXISTS MsgData(name TEXT,message TEXT, time INTEGER)',[]);
+				});
+			}
+			function addData()
+			{
+				var name = document.getElementById('txtName').value;
+				var msg = document.getElementById('txtMessage').value;
+				db.transaction(function(tx){
+					tx.executeSql('INSERT INTO MsgData VALUES(?,?,?)',[name,msg,new Date().getTime()],function(tx,rs)
+					{
+						alert('Add data successful!');
+					},
+					function(tx,error)
+					{
+						alert(error.source+":"+error.message);
+					});
+				});
+				showData();
+			}
+			function showData()
+			{
+				
+				db.transaction(function(tx){
+					tx.executeSql('SELECT * FROM MsgData',[],function(tx,rs)
+					{
+						clearAllData();
+						for(var i=0;i<rs.rows.length;i++)
+						{
+							var tr = document.createElement('tr');
+							var tdName = document.createElement('td');
+							var tdMessage = document.createElement('td');
+							var tdDate = document.createElement('td');	
+							tdName.innerHTML = rs.rows.item(i).name;
+							tdMessage.innerHTML = rs.rows.item(i).message;
+							tdDate.innertHTML = new Date().setTime(rs.rows.item(i).time).toLocaleString();
+							tr.appendChild(tdName);
+							tr.appendChild(tdMessage);
+							tr.appendChild(tdDate);
+							messageTable.appendChild(tr);
+						}
+					});
+				});
+			}
+			function clearAllData()
+			{
+				for(var i=messageTable.childNodes.length-1;i>=1;i++)
+				{
+					messageTable.removeChild(messageTable.childNodes[i]);
+				}
+			}
+			
+		</script>
+	<body onload="init()">
+		<table>
+			<tr>
+				<td>Name:</td>
+				<td><input type="text" id="txtName" /></td>
+			</tr>
+			<tr>
+				<td>Message:</td>
+				<td><input type="text" id="txtMessage" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Save" onclick="addData();" /></td>
+			</tr>
+		</table>
+		<table id="messageTable" border="1">
+			<tr>
+				<td>Name</td>
+				<td>Message</td>
+				<td>Time</td>
+			</tr>
+		</table>
+	</body>
+</html>
